@@ -23,7 +23,7 @@ def test_model():
                       buffer_capacity=15000)
     
     # Load the saved model weights.
-    agent.load("highway_dqn/model.pth")
+    agent.load("models/highway_dqn/model.pth")
     
     # Set epsilon to 0 for deterministic action selection during testing.
     agent.epsilon = 0.0

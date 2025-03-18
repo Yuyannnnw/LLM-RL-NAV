@@ -6,13 +6,13 @@ from DQN.Logger import TrainingLogger
 
 def main():
     # Create the environment.
-    env = gymnasium.make("highway-fast-v0")
+    env = gymnasium.make("merge-v0")
     # Compute the flattened state dimension.
     state_dim = int(np.prod(env.observation_space.shape))
     action_dim = env.action_space.n
 
     # Create a logger (you can later extend this to log TensorBoard data if desired).
-    logger = TrainingLogger(log_dir="highway_dqn", save_freq=50)
+    logger = TrainingLogger(log_dir="models/merge_dqn", save_freq=50)
 
     # Create the agent with hyperparameters matching the SB3 example.
     agent = DQNAgent(state_dim, action_dim, hidden_layers=[256, 256],
@@ -29,7 +29,7 @@ def main():
                 learning_starts=200, train_freq=1, gradient_steps=1, verbose=1, logger=logger)
 
     # Save the trained model.
-    agent.save("highway_dqn/model.pth")
+    agent.save("models/erge_dqn/model.pth")
 
 if __name__ == "__main__":
     main()

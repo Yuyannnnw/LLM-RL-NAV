@@ -47,8 +47,8 @@ class LLMShapingWrapper(gym.Wrapper):
 
 
 def main():
-    # 1) Make the base highway-fast environment
-    env = gym.make("highway-fast-v0")
+    # 1) Make the base merge-fast environment
+    env = gym.make("merge-v0")
 
     # 2) Wrap it with our LLMShapingWrapper (which keeps base reward)
     env = LLMShapingWrapper(env)
@@ -65,13 +65,13 @@ def main():
               gradient_steps=1,
               target_update_interval=50,
               verbose=1,
-              tensorboard_log="highway_dqn/")
+              tensorboard_log="models/merge_dqn/")
 
     # 4) Train the model for 20,000 timesteps
     model.learn(total_timesteps=2e4)
 
     # 5) Save the trained model
-    model.save("highway_dqn_sb3/model")
+    model.save("models/merge_dqn_sb3/model")
     print("Training complete and model saved.")
 
 

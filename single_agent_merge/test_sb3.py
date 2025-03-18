@@ -7,10 +7,10 @@ from DQN.Agent import DQNAgent  # Assuming your DQNAgent class is in Agent.py
 
 def test_model():
     # Create the environment.
-    env = gymnasium.make("highway-fast-v0", render_mode='rgb_array')
+    env = gymnasium.make("merge-v0", render_mode='rgb_array')
 
     # Initialize the agent with the same hyperparameters used during training.
-    model = DQN.load("highway_dqn_sb3/model")
+    model = DQN.load("models/highway_dqn_sb3/model")
     
 
     # Run test episodes.
