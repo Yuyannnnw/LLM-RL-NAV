@@ -8,6 +8,7 @@
 2. **Tested on Highway-Fast Environment:**  
    - Utilized the [Highway Environment](https://highway-env.farama.org/) (fast version) with its default configuration.
    - Compared the performance of our custom DQN against the DQN implementation from Stable Baselines3.
+   - Configure decentralized environment by modifying the observation space, which result in a drastic decrease in the collision-free success rate.
 
 3. **Basic LLM Prompt using Ollama:**  
    - Provided a simple example of integrating Ollama through Python (compatible with Mac, Linux, Windows, M1/M2/M3, AMD, and NVIDIA architectures).  
@@ -20,7 +21,7 @@
    - The LLM output adjustments to the reward to guide the learning process.
    
 5. **Integrate Reward Shaping:**  
-   - Incorporate reward shaping into the custom DQN to enhance training performance.
+   - Incorporate reward shaping (adding a float term) into the custom DQN.
 
 ## What Needs to Be Done
 1. **Develop Observation Mapping Function:**  
