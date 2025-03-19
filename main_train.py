@@ -1,5 +1,6 @@
 import os
 import gymnasium as gym
+import ollama
 import highway_env
 from stable_baselines3 import DQN
 from stable_baselines3.common.monitor import Monitor
@@ -9,8 +10,38 @@ from tqdm import trange  # for the progress bar
 from utils.utils import get_user_choices, build_model_path, build_logs_path, load_env_config
 
 def call_llm_for_shaping(prev_obs, next_obs, action):
-    """Placeholder for LLM logic."""
-    return 0.0
+    """
+    Queries an LLM to adjust the reward based on previous state, next state, action, and base reward.
+    """
+
+    prompt = f"""
+    You are a reinforcement learning assistant helping to fine-tune rewards of an autonomous vehicle.
+    Only response a numerical float. Do not give me any other information.
+    The value should be in range 0 to 10, where higher value refers to encourage human-like action.
+    Action space is discrete where 0: 'LANE_LEFT', 1: 'IDLE', 2: 'LANE_RIGHT', 3: 'FASTER', 4: 'SLOWER'.   
+    Given the following information:
+    - Previous Observation: {prev_obs}
+    - Action Taken: {action}
+    - New Observation: {next_obs}
+    
+    Adjust the reward to improve learning.  
+    """
+    #print("Prompt to LLM:")
+    response = ollama.chat(
+        model='llama3.2',
+        messages=[{'role': 'user', 'content': prompt}]
+    )
+    #print(f"LLM Response: {response}")
+    
+    try:
+        # Extract numerical adjustment from LLM response
+        shaping_value = float(response['message']['content'].strip())
+    except ValueError:
+        shaping_value = 0.0  # Default to 0 if parsing fails
+
+    #print(f"Shaping Value: {shaping_value}")
+    
+    return shaping_value
 
 class EnvWrapper(gym.Wrapper):
     """
@@ -34,7 +65,7 @@ class EnvWrapper(gym.Wrapper):
             total_reward = base_reward
         elif self.mode == 'Hybrid':
             collision_penalty = -1.0 if info.get("crashed", False) else 0.0
-            shaping_term = call_llm_for_shaping(self.prev_obs, next_obs, action)
+            shaping_term = call_llm_for_shaping(self.prev_obs, next_obs, action) / 10.0
             total_reward = collision_penalty + shaping_term
         else:
             total_reward = base_reward
