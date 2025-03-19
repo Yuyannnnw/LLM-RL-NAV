@@ -64,9 +64,10 @@ class EnvWrapper(gym.Wrapper):
         if self.mode == 'RL':
             total_reward = base_reward
         elif self.mode == 'Hybrid':
-            collision_penalty = -1.0 if info.get("crashed", False) else 0.0
+            #collision_penalty = -1.0 if info.get("crashed", False) else 0.0
             shaping_term = call_llm_for_shaping(self.prev_obs, next_obs, action) / 10.0
-            total_reward = collision_penalty + shaping_term
+            #total_reward = collision_penalty + shaping_term
+            total_reward = base_reward + shaping_term
         else:
             total_reward = base_reward
 
