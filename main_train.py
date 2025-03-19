@@ -18,6 +18,7 @@ def call_llm_for_shaping(prev_obs, next_obs, action):
     You are a reinforcement learning assistant helping to fine-tune rewards of an autonomous vehicle.
     Only response a numerical float. Do not give me any other information.
     The value should be in range 0 to 10, where higher value refers to encourage human-like action.
+    Observation space is a matrix where each row represents a vehicle (first row is myself) and columns are [relative x, relative y, velocity x, velocity y, heading (radians)].
     Action space is discrete where 0: 'LANE_LEFT', 1: 'IDLE', 2: 'LANE_RIGHT', 3: 'FASTER', 4: 'SLOWER'.   
     Given the following information:
     - Previous Observation: {prev_obs}
