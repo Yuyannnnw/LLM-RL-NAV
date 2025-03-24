@@ -17,8 +17,9 @@ def call_llm_for_shaping(prev_obs, next_obs, action):
     prompt = f"""
     You are a reinforcement learning assistant helping to fine-tune rewards of an autonomous vehicle.
     Only response a numerical float. Do not give me any other information.
-    The value should be in range 0 to 10, where higher value refers to encourage human-like action.
-    Observation space is a matrix where each row represents a vehicle (first row is myself) and columns are [relative x, relative y, velocity x, velocity y, heading (radians)].
+    The value should be in range 0 to 10, where higher value refers to encourage human-like action (considering speed, safety, and priority).
+    Observation space is a matrix where each row represents a vehicle (first row is the ego-vehicle) and columns are [position x, position y, velocity x, velocity y, heading (radians)].
+    The x, y of the the ego-vehicle are absolute; they are relative to ego-vehicle for other vehicles.
     Action space is discrete where 0: 'LANE_LEFT', 1: 'IDLE', 2: 'LANE_RIGHT', 3: 'FASTER', 4: 'SLOWER'.   
     Given the following information:
     - Previous Observation: {prev_obs}
@@ -27,6 +28,7 @@ def call_llm_for_shaping(prev_obs, next_obs, action):
     
     Adjust the reward to improve learning.  
     """
+
     #print("Prompt to LLM:")
     response = ollama.chat(
         model='llama3.2',
@@ -40,7 +42,7 @@ def call_llm_for_shaping(prev_obs, next_obs, action):
     except ValueError:
         shaping_value = 0.0  # Default to 0 if parsing fails
 
-    #print(f"Shaping Value: {shaping_value}")
+    print(f"Shaping Value: {shaping_value}")
     
     return shaping_value
 
@@ -65,10 +67,10 @@ class EnvWrapper(gym.Wrapper):
         if self.mode == 'RL':
             total_reward = base_reward
         elif self.mode == 'Hybrid':
-            #collision_penalty = -1.0 if info.get("crashed", False) else 0.0
+            collision_penalty = -1.0 if info.get("crashed", False) else 0.0
             shaping_term = call_llm_for_shaping(self.prev_obs, next_obs, action) / 10.0
-            #total_reward = collision_penalty + shaping_term
-            total_reward = base_reward + shaping_term
+            total_reward = collision_penalty + shaping_term
+            #total_reward = base_reward + shaping_term
         else:
             total_reward = base_reward
 
