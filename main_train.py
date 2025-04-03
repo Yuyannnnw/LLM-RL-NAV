@@ -26,7 +26,6 @@ def call_llm_for_shaping(prev_obs, next_obs, action):
     - Previous Observation: {prev_obs}
     - Action Taken: {action}
     - New Observation: {next_obs}
-    
     Adjust the reward to improve learning.  
     """
 
@@ -43,7 +42,7 @@ def call_llm_for_shaping(prev_obs, next_obs, action):
     except ValueError:
         shaping_value = 0.0  # Default to 0 if parsing fails
 
-    print(f"Shaping Value: {shaping_value}")
+    #print(f"Shaping Value: {shaping_value}")
     
     return shaping_value
 
@@ -69,7 +68,7 @@ class EnvWrapper(gym.Wrapper):
             total_reward = base_reward
             print(total_reward)
         elif self.mode == 'Hybrid':
-            collision_penalty = -1.0 if info.get("crashed", False) else 0.0
+            #collision_penalty = -1.0 if info.get("crashed", False) else 0.0
             shaping_term = call_llm_for_shaping(self.prev_obs, next_obs, action) / 10.0
             #total_reward = collision_penalty + shaping_term
             total_reward = base_reward + shaping_term
@@ -117,7 +116,7 @@ def main():
     total_timesteps = 20_000
 
     # 7) Chunked training with a progress bar after each chunk
-    chunks_num = 10
+    chunks_num = 20
     chunk_size = total_timesteps // chunks_num
     chunks = total_timesteps // chunk_size  
 
