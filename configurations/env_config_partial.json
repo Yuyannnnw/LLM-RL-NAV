@@ -1,8 +1,9 @@
 {
     "observation": {
       "type": "Kinematics",
-      "features": ["x", "y", "vx", "vy", "heading"],
-      "absolute": false
+      "features": ["x", "y", "heading", "vx", "vy"],
+      "absolute": true
+      
     }
 }
   
