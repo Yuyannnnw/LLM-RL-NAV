@@ -11,9 +11,9 @@ from stable_baselines3 import DQN
 # Utility functions
 from utils.utils import get_user_choices, build_model_path, build_logs_path, load_env_config
 def main():
-    # 1) Prompt user for environment and mode
-    env_id, mode = get_user_choices()
-    env_config = load_env_config()
+    # 1) Prompt user for configuration settings
+    env_id, mode, observation_type, run_id = get_user_choices()
+    env_config = load_env_config(observation_type)
 
     # 2) Prompt user for how many episodes to evaluate
     num_test_episodes = input("How many test episodes do you want to run? ")
@@ -31,7 +31,7 @@ def main():
 
     # 4) Build the path to the model
     folder_name = "models"
-    model_path = build_model_path(folder_name, env_id, mode)
+    model_path = build_model_path(folder_name, env_id, mode, observation_type, run_id)
     model_file = model_path + ".zip"
 
     # 5) Check if the .zip file exists
@@ -40,7 +40,7 @@ def main():
         print("Make sure you trained it first or that your paths match.")
         return
 
-    # 6) Create the environment 
+    # 6) Create the environment
     base_env = gym.make(env_id, render_mode=None, config=env_config)
 
     # 7) Handle random seed
@@ -58,7 +58,7 @@ def main():
 
     # 9) Prepare for evaluation logs
     eval_logs_folder = "eval_logs"
-    eval_logs_dir = build_logs_path(eval_logs_folder, env_id, mode)
+    eval_logs_dir = build_logs_path(eval_logs_folder, env_id, mode, observation_type, run_id)
     os.makedirs(eval_logs_dir, exist_ok=True)
     csv_path = os.path.join(eval_logs_dir, "eval.csv")
 

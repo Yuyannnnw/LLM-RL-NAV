@@ -12,11 +12,11 @@ from utils.utils import (
 )
 
 def main():
-    # 1) Prompt user for environment + mode
-    env_id, mode = get_user_choices()
+    # 1) Prompt user for configuration settings
+    env_id, mode, observation_type, run_id = get_user_choices()
 
     # Create a directory for saving plots: plots/<env_id>/<mode>
-    plot_dir = build_logs_path("plots", env_id, mode)
+    plot_dir = build_logs_path("plots", env_id, mode, observation_type, run_id)
     os.makedirs(plot_dir, exist_ok=True)
     print(f"Plots will be saved to: {plot_dir}\n")
 
@@ -24,7 +24,7 @@ def main():
     # PART A: TRAINING (Monitor logs) -> [r, l, t]
     # ------------------------------------------------------------------
     monitor_base = "monitor_logs"
-    monitor_dir = build_logs_path(monitor_base, env_id, mode)
+    monitor_dir = build_logs_path(monitor_base, env_id, mode, observation_type, run_id)
     monitor_csv_path = os.path.join(monitor_dir, "monitor.csv")
 
     row_indices, rewards, times = parse_monitor_logs(monitor_csv_path)
@@ -64,7 +64,7 @@ def main():
     # PART B: EVALUATION (episode, reward, success)
     # ------------------------------------------------------------------
     eval_base = "eval_logs"
-    eval_dir = build_logs_path(eval_base, env_id, mode)
+    eval_dir = build_logs_path(eval_base, env_id, mode, observation_type, run_id)
     eval_csv_path = os.path.join(eval_dir, "eval.csv")
 
     episodes_eval, rewards_eval, successes_eval = parse_eval_logs(eval_csv_path)

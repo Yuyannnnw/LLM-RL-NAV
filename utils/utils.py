@@ -3,52 +3,80 @@ import csv
 import matplotlib.pyplot as plt
 import json
 
-def load_env_config(config_path = "configurations/env_config.json"):
+def load_env_config(observation_type, base_path="configurations/env_config"):
     """
-    Loads the JSON config file for environment settings.
+    Loads the JSON config file for environment settings based on observation_type.
+    Looks for:
+      <base_path>_<observation_type>.json
+    e.g. configurations/env_config_full.json or configurations/env_config_partial.json
     """
+    # Build the config filename
+    obs_clean = observation_type.replace('-', '_').replace(' ', '_')
+    config_path = f"{base_path}_{obs_clean}.json"
+
     if not os.path.isfile(config_path):
         print(f"No config file found at {config_path}, proceeding with defaults.")
         return {}
+
     with open(config_path, 'r') as f:
         config_data = json.load(f)
     return config_data
 
-def build_model_path(folder_name, env_id, mode):
+def build_model_path(folder_name, env_id, mode, observation_type, run_id=None):
     """
     Create a cross-platform path for the model file in nested folders:
-    folder_name/env_id/mode/model
+      folder_name/env_id/mode/observation_type/model[_run_id].zip
 
-    Replaces certain special characters in env_id or mode if needed.
+    If run_id is provided, it will be appended to the filename only.
     """
-    # Clean up strings to avoid issues with special chars:
-    env_id_clean = env_id.replace('-', '_').replace(' ', '_')
-    mode_clean = mode.replace(' ', '_')
+    # Clean up inputs
+    env_clean  = clean(env_id)
+    mode_clean = clean(mode)
+    obs_clean  = clean(observation_type)
 
-    # Build nested directory path:
-    nested_dir = os.path.join(folder_name, env_id_clean, mode_clean)
-    
-    # Final filename for the model
-    filename = "model" 
+    # Build the directory path
+    nested_dir = os.path.join(folder_name, env_clean, mode_clean, obs_clean)
+    os.makedirs(nested_dir, exist_ok=True)
 
+    # Build the filename
+    if run_id is not None:
+        run_clean = clean(run_id)
+        filename = f"model_{run_clean}"
+    else:
+        filename = "model"
+
+    # SB3 will append .zip automatically
     return os.path.join(nested_dir, filename)
 
-def build_logs_path(folder_name, env_id, mode):
-    """
-    Returns a nested folder path for logs:
-      folder_name/env_id/mode/
-    e.g. monitor_logs/highway_fast_v0/Hybrid/
-    """
-    env_id_clean = env_id.replace('-', '_').replace(' ', '_')
-    mode_clean = mode.replace(' ', '_')
-    return os.path.join(folder_name, env_id_clean, mode_clean)
 
+def build_logs_path(folder_name, env_id, mode, observation_type, run_id):
+    """
+    Returns a nested folder path under 'logs/':
+      logs/<folder_name>/<env_id>/<mode>/<observation_type>/<run_id>/
+
+    All inputs are sanitized (spaces & hyphens → underscores).
+    """
+    # Clean up inputs
+    env_clean  = clean(env_id)
+    mode_clean = clean(mode)
+    obs_clean  = clean(observation_type)
+    run_clean  = clean(run_id)
+
+    return os.path.join(
+        "logs",
+        folder_name,
+        env_clean,
+        mode_clean,
+        obs_clean,
+        run_clean
+    )
 
 def get_user_choices():
     """
-    Prompt user for environment and training type, 
-    return (env_id, mode) tuple.
+    Prompt user for environment, training type, and observation mode.
+    Returns a tuple: (env_id, mode, observation)
     """
+    # Environment selection
     print("Choose environment:")
     print("1. highway-fast-v0")
     print("2. highway-v0")
@@ -65,7 +93,8 @@ def get_user_choices():
         print("Invalid choice, defaulting to 'highway-fast-v0'")
         env_id = "highway-fast-v0"
 
-    print("Choose training type:")
+    # Training type selection
+    print("\nChoose training type:")
     print("1. RL (standard base reward)")
     print("2. Hybrid (LLM + collision penalty)")
     train_choice = input("Enter the number of your choice: ")
@@ -75,10 +104,29 @@ def get_user_choices():
     elif train_choice == '2':
         mode = 'Hybrid'
     else:
-        print("Invalid choice, defaulting to RL.")
+        print("Invalid choice, defaulting to 'RL'")
         mode = 'RL'
 
-    return env_id, mode
+    # Observation mode selection
+    print("\nChoose observation mode:")
+    print("1. Full observation")
+    print("2. Partial observation")
+    obs_choice = input("Enter the number of your choice: ")
+
+    if obs_choice == '1':
+        observation = 'full'
+    elif obs_choice == '2':
+        observation = 'partial'
+    else:
+        print("Invalid choice, defaulting to 'full'")
+        observation = 'full'
+    
+    # Optional run ID
+    print("\nEnter a run ID to save this model under (or press Enter to overwrite existing model):")
+    run_id_input = input("Run ID: ").strip()
+    run_id = run_id_input if run_id_input else None
+
+    return env_id, mode, observation, run_id
 
 def parse_monitor_logs(monitor_csv_path):
     """
@@ -187,3 +235,6 @@ def plot_evaluation_summary_table(total_episodes, total_collisions, success_rate
                      loc='center')
     table.scale(1, 2)  # optionally adjust table size
     ax.set_title("Evaluation Summary", fontsize=12, pad=10)
+
+def clean(s):
+    return str(s).replace('-', '_').replace(' ', '_')
