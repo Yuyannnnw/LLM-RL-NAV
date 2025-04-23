@@ -16,20 +16,21 @@ def call_llm_for_shaping(prev_obs, next_obs, action):
 
     prompt = f"""
     You are a reinforcement learning assistant helping to fine-tune rewards of an autonomous vehicle.
-    Only response a numerical float. Do not give me any other information.
+    Only respond a numerical float. Do not provide any other information.
     The value should be in range 0 to 10, where higher value refers to encourage human-like action.
-    Observation space is a matrix where each row represents a vehicle (first row is myself) and columns are [relative x, relative y, heading (radians), velocity x, velocity y].
+    Observation space is a matrix where each row represents a vehicle (first row is the ego-vehicle) and columns are [position x, position y, velocity x, velocity y, heading (radians)].
     Action space is discrete where 0: 'LANE_LEFT', 1: 'IDLE', 2: 'LANE_RIGHT', 3: 'FASTER', 4: 'SLOWER'.   
+    If the ego-vehicle is very close to another vehicle, the reward should be low if the action is not slower or change the lane.
+    The x, y of the the ego-vehicle are absolute; The x, y of other vehicles are relative to those of ego-vehicle.
     Given the following information:
     - Previous Observation: {prev_obs}
     - Action Taken: {action}
     - New Observation: {next_obs}
-    
     Adjust the reward to improve learning.  
     """
-    #print("Prompt to LLM:")
+    print("Prompt to LLM:")
     response = ollama.chat(
-        model='llama3.2',
+        model='llama3.3',
         messages=[{'role': 'user', 'content': prompt}]
     )
     #print(f"LLM Response: {response}")
