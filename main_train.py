@@ -114,7 +114,7 @@ def main():
         target_update_interval=50,
         verbose=0,
     )
-    total_timesteps = 10_000
+    total_timesteps = 50_000
 
     # 7) Chunked training with a progress bar after each chunk
     chunks_num = 10
