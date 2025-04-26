@@ -1,7 +1,7 @@
 {
     "observation": {
       "type": "Kinematics",
-      "absolute": true
+      "absolute": false
     }
 }
   

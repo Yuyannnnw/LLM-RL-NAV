@@ -1,4 +1,5 @@
 import os
+#export CUDA_VISIBLE_DEVICES=3
 import gymnasium as gym
 import ollama
 import highway_env
@@ -28,9 +29,10 @@ def call_llm_for_shaping(prev_obs, next_obs, action):
     - New Observation: {next_obs}
     Adjust the reward to improve learning.  
     """
-    print("Prompt to LLM:")
+    #print("Prompt to LLM:")
     response = ollama.chat(
-        model='llama3.3',
+        model='llama3.2',
+        #model='gemma3:27b',
         messages=[{'role': 'user', 'content': prompt}]
     )
     #print(f"LLM Response: {response}")
@@ -85,6 +87,10 @@ def main():
     monitor_csv_path = os.path.join(monitor_dir, "monitor.csv")
 
     # 3) Create base environment
+    # if observation_type == "full":
+    #     base_env = gym.make(env_id)
+    # else:
+    #     
     base_env = gym.make(env_id, render_mode=None, config= env_config)
 
     # 4) Wrap it with Monitor to log to CSV
@@ -108,7 +114,7 @@ def main():
         target_update_interval=50,
         verbose=0,
     )
-    total_timesteps = 20_000
+    total_timesteps = 10_000
 
     # 7) Chunked training with a progress bar after each chunk
     chunks_num = 10
