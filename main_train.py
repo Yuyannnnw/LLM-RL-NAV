@@ -114,10 +114,10 @@ def main():
         target_update_interval=50,
         verbose=0,
     )
-    total_timesteps = 150_000
+    total_timesteps = 10_000
 
     # 7) Chunked training with a progress bar after each chunk
-    chunks_num = 15
+    chunks_num = 10
     chunk_size = total_timesteps // chunks_num
     chunks = total_timesteps // chunk_size  
 

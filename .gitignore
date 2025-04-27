@@ -55,9 +55,7 @@ pytestdebug.log
 
 # Gymnasium-specific (monitoring outputs, videos, logs)
 videos/
-logs/
 #monitor.csv
 
 # Stable Baselines3 (SB3) specific (logs, TensorBoard outputs)
 tensorboard/
-logs/
