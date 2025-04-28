@@ -31,7 +31,7 @@ def call_llm_for_shaping(prev_obs, next_obs, action):
     """
     #print("Prompt to LLM:")
     response = ollama.chat(
-        model='llama3.2',
+        model='llama3.3',
         #model='gemma3:27b',
         messages=[{'role': 'user', 'content': prompt}]
     )
@@ -114,10 +114,10 @@ def main():
         target_update_interval=50,
         verbose=0,
     )
-    total_timesteps = 10_000
+    total_timesteps = 150_000
 
     # 7) Chunked training with a progress bar after each chunk
-    chunks_num = 10
+    chunks_num = 15
     chunk_size = total_timesteps // chunks_num
     chunks = total_timesteps // chunk_size  
 
