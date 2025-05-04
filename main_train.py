@@ -18,7 +18,7 @@ def call_llm_for_shaping(prev_obs, next_obs, action):
     prompt = f"""
     You are a reinforcement learning assistant helping to fine-tune rewards of an autonomous vehicle.
     Only respond a numerical float. Do not provide any other information.
-    The value should be in range 0 to 10, where higher value refers to encourage human-like action.
+    The value should be in range 0 to 10, where higher value refers to encourage human-like action and faster speed.
     Observation space is a matrix where each row represents a vehicle (first row is the ego-vehicle) and columns are [position x, position y, velocity x, velocity y, heading (radians)].
     Action space is discrete where 0: 'LANE_LEFT', 1: 'IDLE', 2: 'LANE_RIGHT', 3: 'FASTER', 4: 'SLOWER'.   
     If the ego-vehicle is very close to another vehicle, the reward should be low if the action is not slower or change the lane.
@@ -114,10 +114,10 @@ def main():
         target_update_interval=50,
         verbose=0,
     )
-    total_timesteps = 150_000
+    total_timesteps = 20_000
 
     # 7) Chunked training with a progress bar after each chunk
-    chunks_num = 15
+    chunks_num = 10
     chunk_size = total_timesteps // chunks_num
     chunks = total_timesteps // chunk_size  
 
